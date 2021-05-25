@@ -9,7 +9,7 @@
 using GlobalConstants::c;
 using GlobalConstants::pi;
 
-void update_H(std::vector<double>& Hx, std::vector<double>& Ey, std::vector<double>& mHx, double dz, uint32_t Nz)
+inline void update_H(std::vector<double>& Hx, std::vector<double>& Ey, std::vector<double>& mHx, double dz, uint32_t Nz)
 {
 	for (int nz = 0; nz < Nz - 1; ++nz)
 	{
@@ -17,7 +17,7 @@ void update_H(std::vector<double>& Hx, std::vector<double>& Ey, std::vector<doub
 	}
 }
 
-void update_E(std::vector<double>& Ey, std::vector<double>& Hx, std::vector<double>& mEy, double dz, uint32_t Nz)
+inline void update_E(std::vector<double>& Ey, std::vector<double>& Hx, std::vector<double>& mEy, double dz, uint32_t Nz)
 {
 	for (int nz = 1; nz < Nz; ++nz)
 	{
