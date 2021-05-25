@@ -39,9 +39,6 @@
     <ClCompile Include="Slab.cpp">
       <Filter>Source Files\Devices</Filter>
     </ClCompile>
-    <ClCompile Include="FourierTransform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BraggGrating.cpp">
       <Filter>Source Files\Devices</Filter>
     </ClCompile>
@@ -64,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="SlabProblemInstance.h">
       <Filter>Header Files\ProblemInstances</Filter>
-    </ClInclude>
-    <ClInclude Include="FourierTransform.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BraggGratingProblemInstance.h">
       <Filter>Header Files\ProblemInstances</Filter>

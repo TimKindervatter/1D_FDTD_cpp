@@ -7,6 +7,7 @@
 #include "PythonUtilities.h"
 
 using GlobalConstants::c;
+using GlobalConstants::pi;
 
 void update_H(std::vector<double>& Hx, std::vector<double>& Ey, std::vector<double>& mHx, double dz, uint32_t Nz)
 {
@@ -107,7 +108,21 @@ void FDTD_engine()
 	double e2 = 0.0;
 	double e1 = 0.0;
 
-	FourierTransform fourier_transform_manager = problem_instance.fourier_transform_manager;
+	int num_frequencies = problem_instance.num_frequencies; 
+	double time_step = compute_time_step(problem_instance.device);
+
+	int m_num_frequencies{ num_frequencies };
+	double m_time_step{ time_step };
+	std::vector<double> m_frequencies{ linspace(0.0, problem_instance.max_frequency, num_frequencies) };
+	std::vector<std::complex<double>> m_reflected_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
+	std::vector<std::complex<double>> m_transmitted_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
+	std::vector<std::complex<double>> m_source_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
+	std::vector<double> m_reflectance(num_frequencies, 0.0);
+	std::vector<double> m_transmittance(num_frequencies, 0.0);
+	std::vector<double> m_conservation_of_energy(num_frequencies, 0.0);
+
+	std::complex<double> imaginary_unit{ 0.0, 1.0 };
+	auto m_kernel = exp(imaginary_unit * 2.0 * pi * time_step * m_frequencies);
 
 	for (int T = 0; T < steps; ++T)
 	{
@@ -137,8 +152,20 @@ void FDTD_engine()
 		// Handle E-field source
 		Ey.at(source_location) = Ey.at(source_location) - (mEy.at(source_location) / dz) * Hxsrc.at(T);
 
-		fourier_transform_manager.update_fourier_transforms(T, Ey, Eysrc, Nz);
-		fourier_transform_manager.finalize_fourier_transforms();
+		for (int f = 0; f < m_num_frequencies; ++f)
+		{
+			m_reflected_fourier.at(f) += pow(m_kernel.at(f), T) * Ey.at(0);
+			m_transmitted_fourier.at(f) += pow(m_kernel.at(f), T) * Ey.at(Nz - 1);
+			m_source_fourier.at(f) += pow(m_kernel.at(f), T) * Eysrc.at(T);
+		}
+
+		m_reflectance = squared_magnitude(m_reflected_fourier / m_source_fourier);
+		m_transmittance = squared_magnitude(m_transmitted_fourier / m_source_fourier);
+		m_conservation_of_energy = m_reflectance + m_transmittance;
+
+		m_reflected_fourier = m_reflected_fourier * m_time_step;
+		m_transmitted_fourier = m_transmitted_fourier * m_time_step;
+		m_source_fourier = m_source_fourier * m_time_step;
 	}
 
 	return;

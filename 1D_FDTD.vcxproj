@@ -91,6 +91,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,6 +123,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,7 +154,6 @@
     <ClCompile Include="1D_FDTD.cpp" />
     <ClCompile Include="BraggGrating.cpp" />
     <ClCompile Include="Device.cpp" />
-    <ClCompile Include="FourierTransform.cpp" />
     <ClCompile Include="Slab.cpp" />
     <ClCompile Include="FDTD_engine.cpp" />
     <ClCompile Include="Utilities.cpp" />
@@ -162,7 +163,6 @@
     <ClInclude Include="BraggGratingProblemInstance.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="FDTD_engine.h" />
-    <ClInclude Include="FourierTransform.h" />
     <ClInclude Include="ProblemInstances.h" />
     <ClInclude Include="Slab.h" />
     <ClInclude Include="SlabProblemInstance.h" />

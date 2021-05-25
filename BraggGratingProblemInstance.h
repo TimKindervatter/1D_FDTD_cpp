@@ -16,5 +16,4 @@ struct BraggGratingProblemInstance
 	double ymin{ -2 };
 	double ymax{ 2 };
 	std::string source_type{ "Pulse" };
-	FourierTransform fourier_transform_manager{ num_frequencies, max_frequency, compute_time_step(device) };
 };
