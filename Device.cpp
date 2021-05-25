@@ -110,10 +110,10 @@ void Device::generate_material_grid(std::vector<double>& epsilon_r, std::vector<
 	assert(m_layer_permeabilities.size() == m_layer_sizes.size());
 
 	epsilon_r.resize(m_full_grid_size);
-	std::fill(std::begin(epsilon_r), std::end(epsilon_r), 1.0);
+	std::fill(std::begin(epsilon_r), std::end(epsilon_r), 1.0f);
 
 	mu_r.resize(m_full_grid_size);
-	std::fill(std::begin(mu_r), std::end(mu_r), 1.0);
+	std::fill(std::begin(mu_r), std::end(mu_r), 1.0f);
 
 	for (size_t i = 0; i < m_layer_sizes.size(); ++i)
 	{

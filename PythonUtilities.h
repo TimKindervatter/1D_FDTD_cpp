@@ -9,8 +9,8 @@
 
 // Array Creation
 
-template<typename T>
-std::vector<double> linspace(T start_in, T end_in, int num_in)
+template<typename T1, typename T2>
+std::vector<double> linspace(T1 start_in, T2 end_in, int num_in)
 {
     std::vector<double> linspaced;
 
@@ -108,12 +108,12 @@ auto exp(const std::vector<T>& vec1)
 
 // Max and Min
 
-template<typename T>
-auto max(const std::vector<T>& vec, T default_value = T{})
+template<typename T1, typename T2>
+auto max(const std::vector<T1>& vec, T2 default_value = T{})
 {
     auto max_element_iter = std::max_element(std::begin(vec), std::end(vec));
 
-    T max_element{ default_value };
+    T1 max_element{ default_value };
     if (max_element_iter != std::end(vec))
     {
         max_element = *max_element_iter;
@@ -122,12 +122,12 @@ auto max(const std::vector<T>& vec, T default_value = T{})
     return max_element;
 }
 
-template<typename T>
-auto min(const std::vector<T>& vec, T default_value = T{})
+template<typename T1, typename T2>
+auto min(const std::vector<T1>& vec, T2 default_value = T{})
 {
     auto min_element_iter = std::min_element(std::begin(vec), std::end(vec));
 
-    T min_element{ default_value };
+    T1 min_element{ default_value };
     if (min_element_iter != std::end(vec))
     {
         min_element = *min_element_iter;

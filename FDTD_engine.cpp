@@ -60,7 +60,7 @@ void FDTD_engine()
 	}
 	
 	// Compute number of time steps
-	double max_index_of_refraction = max(n, 1.0);
+	double max_index_of_refraction = max(n, 1.0f);
 	double t_prop = max_index_of_refraction * Nz * dz / c;
 
 	double total_runtime = problem_instance.duration_multiplier * (12 * tau + 5 * t_prop);
@@ -69,7 +69,7 @@ void FDTD_engine()
 	// Compute source functions for Ey/Hx mode
 	std::vector<double> t = arange(0, steps) * dt;
 	double A = std::sqrt(epsilon_r.at(source_location) / mu_r.at(source_location));
-	double deltat = n.at(source_location) * dz / (2.0 * c) + dt / 2;
+	double deltat = n.at(source_location) * dz / (2.0f * c) + dt / 2;
 
 	std::vector<double> Eysrc;
 	std::vector<double> Hxsrc;
@@ -113,7 +113,7 @@ void FDTD_engine()
 
 	int m_num_frequencies{ num_frequencies };
 	double m_time_step{ time_step };
-	std::vector<double> m_frequencies{ linspace(0.0, problem_instance.max_frequency, num_frequencies) };
+	std::vector<double> m_frequencies{ linspace(0.0f, problem_instance.max_frequency, num_frequencies) };
 	std::vector<std::complex<double>> m_reflected_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
 	std::vector<std::complex<double>> m_transmitted_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
 	std::vector<std::complex<double>> m_source_fourier(num_frequencies, std::complex<double>{0.0, 0.0});

@@ -7,7 +7,7 @@
 
 struct SlabProblemInstance
 {
-	double max_frequency{1e9}; // Hz
+	double max_frequency{1e9f}; // Hz
 	Slab device = Slab(max_frequency);
 	int num_frequencies{100};
 	int plot_update_interval{20};

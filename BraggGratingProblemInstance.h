@@ -7,7 +7,7 @@
 
 struct BraggGratingProblemInstance
 {
-	double max_frequency{ 1.5e15 }; // Hz
+	double max_frequency{ 1.5e15f }; // Hz
 	BraggGrating device = BraggGrating(max_frequency);
 	int num_frequencies{ 500 };
 	int plot_update_interval{ 20 };
