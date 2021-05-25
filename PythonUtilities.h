@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <cmath>
 #include <algorithm>
+#include <complex>
+#include <execution>
 
 // Array Creation
 
@@ -59,6 +61,19 @@ auto abs(const std::vector<T>& vec1)
         std::end(vec1),
         std::back_inserter(return_vector),
         [](auto elem) {return std::abs(elem); });
+
+    return return_vector;
+}
+template<typename T>
+auto squared_magnitude(const std::vector<T>& vec1)
+{
+    using vec_type = decltype(std::norm(std::declval<T>()));
+    std::vector<vec_type> return_vector;
+    return_vector.reserve(vec1.size());
+    std::transform(std::begin(vec1),
+        std::end(vec1),
+        std::back_inserter(return_vector),
+        [](auto elem) {return std::norm(elem); }); // std::real(elem) * std::real(elem) + std::imag(elem) * std::imag(elem)
 
     return return_vector;
 }
@@ -234,6 +249,20 @@ auto operator*(const std::vector<T1>& vec1, T2 scalar)
         std::end(vec1),
         std::back_inserter(return_vector),
         [scalar](auto elem) {return elem * scalar; });
+
+    return return_vector;
+}
+
+template<> inline
+auto operator*<std::complex<double>, double>(const std::vector<std::complex<double>>& vec1, double scalar)
+{
+    using vec_type = decltype(std::declval<std::complex<double>>() * std::declval<double>());
+    std::vector<vec_type> return_vector;
+    return_vector.reserve(vec1.size());
+    std::transform(std::begin(vec1),
+        std::end(vec1),
+        std::back_inserter(return_vector),
+        [scalar](auto elem) {return std::complex{ elem.real() * scalar, elem.imag() * scalar }; });
 
     return return_vector;
 }
