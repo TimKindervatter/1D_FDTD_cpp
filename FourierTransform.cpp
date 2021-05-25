@@ -3,9 +3,9 @@
 using GlobalConstants::pi;
 
 FourierTransform::FourierTransform(int Nfreq, double max_frequency, double time_step) :
-	m_num_frequencies{Nfreq},
-	m_time_step{time_step},
-	m_frequencies{linspace(0.0, max_frequency, Nfreq)},
+	m_num_frequencies{ Nfreq },
+	m_time_step{ time_step },
+	m_frequencies{ linspace(0.0, max_frequency, Nfreq) },
 	m_reflected_fourier(Nfreq, std::complex<double>{0.0, 0.0}),
 	m_transmitted_fourier(Nfreq, std::complex<double>{0.0, 0.0}),
 	m_source_fourier(Nfreq, std::complex<double>{0.0, 0.0}),
@@ -26,8 +26,8 @@ void FourierTransform::update_fourier_transforms(int T, const std::vector<double
 		m_source_fourier.at(f) += pow(m_kernel.at(f), T) * Eysrc.at(T);
 	}
 
-	m_reflectance = pow(abs(m_reflected_fourier / m_source_fourier), 2);
-	m_transmittance = pow(abs(m_transmitted_fourier / m_source_fourier), 2);
+	m_reflectance = squared_magnitude(m_reflected_fourier / m_source_fourier);
+	m_transmittance = squared_magnitude(m_transmitted_fourier / m_source_fourier);
 	m_conservation_of_energy = m_reflectance + m_transmittance;
 }
 
