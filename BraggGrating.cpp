@@ -1,6 +1,7 @@
 #include "BraggGrating.h"
 
 #include <cmath>
+#include <iostream>
 
 BraggGrating::BraggGrating(floating_point_t max_frequency)
 {
@@ -22,17 +23,16 @@ BraggGrating::BraggGrating(floating_point_t max_frequency)
 	Device::initialize(max_frequency);
 }
 
-void BraggGrating::construct_grating_arrays(std::vector<floating_point_t>& vec, floating_point_t spacer_region_value, floating_point_t grating_layer_1_value, floating_point_t grating_layer_2_value, int num_periods)
+void BraggGrating::construct_grating_arrays(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& vec, floating_point_t spacer_region_value, floating_point_t grating_layer_1_value, floating_point_t grating_layer_2_value, int num_periods)
 {
 	int num_grating_layers = 2 * num_periods; // Each period has one SiN layer and one SiO2 layer
 
-	vec.reserve(num_grating_layers + 2); // All grating layers plus one spacer region on each side
-	vec.push_back(spacer_region_value);
-	for (int i = 0; i < num_periods; ++i)
+	vec.conservativeResize(num_grating_layers + 2); // All grating layers plus one spacer region on each side
+	vec[0] = spacer_region_value;
+	for (int i = 1; i < vec.size() - 1; ++i)
 	{
 		// Pattern is Layer 2, Layer 1, Layer2, Layer1, ...
-		vec.push_back(grating_layer_2_value);
-		vec.push_back(grating_layer_1_value);
+		vec[i] = (i % 2 == 1) ? grating_layer_2_value : grating_layer_1_value;
 	}
-	vec.push_back(spacer_region_value);
+	vec[vec.size() - 1] = spacer_region_value;
 }
