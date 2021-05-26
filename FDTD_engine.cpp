@@ -128,7 +128,8 @@ void FDTD_engine()
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_conservation_of_energy(num_frequencies);
 
 	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
-	auto m_kernel = exp(imaginary_unit * 2.0f * pi * time_step * m_frequencies);
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f = imaginary_unit * 2.0f * pi * time_step * m_frequencies;
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel = two_pi_i_f.exp();
 
 	for (int T = 0; T < steps; ++T)
 	{
@@ -158,9 +159,14 @@ void FDTD_engine()
 		// Handle E-field source
 		Ey[source_location] = Ey[source_location] - (mEy[source_location] / dz) * Hxsrc[T];
 
+		Eigen::Array < std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = m_kernel.pow(T);
+
 		for (int f = 0; f < m_num_frequencies; ++f)
 		{
-			auto kernel_f_pow = pow(m_kernel[f], T);
+			//std::complex<floating_point_t> elem = m_kernel[f];
+			//auto kernel_f_pow = pow(elem, T);
+
+
 			//auto kernel_f_real = m_kernel.at(f).real();
 			//auto kernel_f_real_pow = pow(m_kernel.at(f), T);
 
@@ -171,19 +177,19 @@ void FDTD_engine()
 			//auto reflected_real = kernel_f_real_pow * Ey0;
 			//auto reflected_imag = kernel_f_imag_pow * Ey0;
 			//m_reflected_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
-			m_reflected_fourier[f] += kernel_f_pow * Ey0;
+			m_reflected_fourier[f] += m_kernel_pow[f] * Ey0;
 
 			auto EyNz = Ey[Nz - 1];
 			//auto transmitted_real = kernel_f_real_pow * EyNz;
 			//auto transmitted_imag = kernel_f_imag_pow * EyNz;
 			//m_transmitted_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
-			m_transmitted_fourier[f] += kernel_f_pow * EyNz;
+			m_transmitted_fourier[f] += m_kernel_pow[f] * EyNz;
 
 			auto EysrcT = Eysrc[T];
 			/*auto source_real = kernel_f_real_pow * EysrcT;
 			auto source_imag = kernel_f_imag_pow * EysrcT;
 			m_source_fourier.at(f) += std::complex{ source_real, source_imag };*/
-			m_source_fourier[f] += kernel_f_pow * EysrcT;
+			m_source_fourier[f] += m_kernel_pow[f] * EysrcT;
 		}
 
 		auto reflected_fraction = m_reflected_fourier / m_source_fourier;
