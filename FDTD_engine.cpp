@@ -154,26 +154,30 @@ void FDTD_engine()
 
 		for (int f = 0; f < m_num_frequencies; ++f)
 		{
-			auto kernel_f_real = m_kernel.at(f).real();
-			auto kernel_f_real_pow = pow(kernel_f_real, T);
+			auto kernel_f_pow = pow(m_kernel.at(f), T);
+			//auto kernel_f_real = m_kernel.at(f).real();
+			//auto kernel_f_real_pow = pow(m_kernel.at(f), T);
 
-			auto kernel_f_imag = m_kernel.at(f).imag();
-			auto kernel_f_imag_pow = pow(kernel_f_imag, T);
+			//auto kernel_f_imag = m_kernel.at(f).imag();
+			//auto kernel_f_imag_pow = pow(kernel_f_imag, T);
 
 			auto Ey0 = Ey.at(0);
-			auto reflected_real = kernel_f_real_pow * Ey0;
-			auto reflected_imag = kernel_f_imag_pow * Ey0;
-			m_reflected_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
+			//auto reflected_real = kernel_f_real_pow * Ey0;
+			//auto reflected_imag = kernel_f_imag_pow * Ey0;
+			//m_reflected_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
+			m_reflected_fourier.at(f) += kernel_f_pow * Ey0;
 
 			auto EyNz = Ey.at(Nz - 1);
-			auto transmitted_real = kernel_f_real_pow * EyNz;
-			auto transmitted_imag = kernel_f_imag_pow * EyNz;
-			m_transmitted_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
+			//auto transmitted_real = kernel_f_real_pow * EyNz;
+			//auto transmitted_imag = kernel_f_imag_pow * EyNz;
+			//m_transmitted_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
+			m_transmitted_fourier.at(f) += kernel_f_pow * EyNz;
 
 			auto EysrcT = Eysrc.at(T);
-			auto source_real = kernel_f_real_pow * EysrcT;
+			/*auto source_real = kernel_f_real_pow * EysrcT;
 			auto source_imag = kernel_f_imag_pow * EysrcT;
-			m_source_fourier.at(f) += std::complex{ source_real, source_imag };
+			m_source_fourier.at(f) += std::complex{ source_real, source_imag };*/
+			m_source_fourier.at(f) += kernel_f_pow * EysrcT;
 		}
 
 		auto reflected_fraction = m_reflected_fourier / m_source_fourier;
