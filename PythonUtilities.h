@@ -288,6 +288,11 @@ auto operator*(const std::vector<T1>& vec1, const std::vector<T2>& vec2)
     return return_vector;
 }
 
+inline std::complex<double> operator*(std::complex<double> z, std::complex<double> w)
+{
+    return std::complex{ z.real() * w.real(), z.imag() * w.imag() };
+}
+
 // /
 
 template<typename T1, typename T2>
@@ -331,6 +336,24 @@ auto operator/(const std::vector<T1>& vec1, const std::vector<T2>& vec2)
         [](auto elem1, auto elem2) {return elem1 / elem2; });
 
     return return_vector;
+}
+
+
+inline std::complex<double> operator/(std::complex<double> z, std::complex<double> w)
+{
+    auto x = z.real();
+    auto y = z.imag();
+    auto u = w.real();
+    auto v = w.imag();
+
+    auto denominator = u * u + v * v;
+    auto real_numerator = x * u + y * v;
+    auto imag_numerator = -x * v + y * u;
+
+    auto real = real_numerator / denominator;
+    auto imag = imag_numerator / denominator;
+
+    return std::complex{ real, imag };
 }
 
 // Unary -
