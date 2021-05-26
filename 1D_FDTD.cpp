@@ -1,6 +1,8 @@
 #include <iostream>
-#include "FDTD_engine.h"
 #include <chrono>
+
+#include "FDTD_engine.h"
+#include "Utilities.h"
 
 int main()
 {
@@ -9,7 +11,7 @@ int main()
     auto stop = std::chrono::high_resolution_clock::now();
 
     auto duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
-    double duration_seconds = 1e-9f * duration_ns;
+    floating_point_t duration_seconds = 1e-9f * duration_ns;
     std::cout << duration_seconds;
 
     return 0;

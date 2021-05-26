@@ -3,14 +3,17 @@
 #include <cstdint>
 #include <string>
 
-#include "Device.h"
+class Device;
+
+using floating_point_t = float;
 
 namespace GlobalConstants
 {
 	constexpr uint32_t c = 299792458;  // Speed of light in m / s
+
 	constexpr double pi = 3.14159265358979323846;
 }
 
-double compute_time_step(const Device& device);
+floating_point_t compute_time_step(const Device& device);
 
 std::string to_lower(std::string s);

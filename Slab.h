@@ -5,6 +5,6 @@
 class Slab : public Device
 {
 public:
-	Slab(double max_frequency);
+	Slab(floating_point_t max_frequency);
 };
 

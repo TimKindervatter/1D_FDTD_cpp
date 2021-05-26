@@ -1,11 +1,12 @@
 #include "Utilities.h"
+#include "Device.h"
 
-double compute_time_step(const Device& device)
+floating_point_t compute_time_step(const Device& device)
 {
-	double nbc = device.get_boundary_refractive_index();
-	double dz = device.get_grid_resolution();
+	floating_point_t nbc = device.get_boundary_refractive_index();
+	floating_point_t dz = device.get_grid_resolution();
 
-	double time_step = nbc * dz / (2.0 * GlobalConstants::c);
+	floating_point_t time_step = nbc * dz / (2.0f * GlobalConstants::c);
 
 	return time_step;
 }

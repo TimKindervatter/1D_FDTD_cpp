@@ -10,13 +10,13 @@
 // Array Creation
 
 template<typename T1, typename T2>
-std::vector<double> linspace(T1 start_in, T2 end_in, int num_in)
+std::vector<floating_point_t> linspace(T1 start_in, T2 end_in, int num_in)
 {
-    std::vector<double> linspaced;
+    std::vector<floating_point_t> linspaced;
 
-    double start = static_cast<double>(start_in);
-    double end = static_cast<double>(end_in);
-    double num = static_cast<double>(num_in);
+    floating_point_t start = static_cast<floating_point_t>(start_in);
+    floating_point_t end = static_cast<floating_point_t>(end_in);
+    floating_point_t num = static_cast<floating_point_t>(num_in);
 
     if (num == 0) { return linspaced; }
     if (num == 1)
@@ -25,7 +25,7 @@ std::vector<double> linspace(T1 start_in, T2 end_in, int num_in)
         return linspaced;
     }
 
-    double delta = (end - start) / (num - 1);
+    floating_point_t delta = (end - start) / (num - 1);
 
     for (int i = 0; i < num - 1; ++i)
     {
@@ -113,7 +113,8 @@ auto max(const std::vector<T1>& vec, T2 default_value = T{})
 {
     auto max_element_iter = std::max_element(std::begin(vec), std::end(vec));
 
-    T1 max_element{ default_value };
+    using promoted_type = decltype(std::declval<T1>() + std::declval<T2>());
+    promoted_type max_element{ default_value };
     if (max_element_iter != std::end(vec))
     {
         max_element = *max_element_iter;
@@ -127,7 +128,8 @@ auto min(const std::vector<T1>& vec, T2 default_value = T{})
 {
     auto min_element_iter = std::min_element(std::begin(vec), std::end(vec));
 
-    T1 min_element{ default_value };
+    using promoted_type = decltype(std::declval<T1>() + std::declval<T2>());
+    promoted_type min_element{ default_value };
     if (min_element_iter != std::end(vec))
     {
         min_element = *min_element_iter;
@@ -254,9 +256,9 @@ auto operator*(const std::vector<T1>& vec1, T2 scalar)
 }
 
 template<> inline
-auto operator*<std::complex<double>, double>(const std::vector<std::complex<double>>& vec1, double scalar)
+auto operator*<std::complex<floating_point_t>, floating_point_t>(const std::vector<std::complex<floating_point_t>>& vec1, floating_point_t scalar)
 {
-    using vec_type = decltype(std::declval<std::complex<double>>() * std::declval<double>());
+    using vec_type = decltype(std::declval<std::complex<floating_point_t>>() * std::declval<floating_point_t>());
     std::vector<vec_type> return_vector;
     return_vector.reserve(vec1.size());
     std::transform(std::begin(vec1),
@@ -288,7 +290,7 @@ auto operator*(const std::vector<T1>& vec1, const std::vector<T2>& vec2)
     return return_vector;
 }
 
-inline std::complex<double> operator*(std::complex<double> z, std::complex<double> w)
+inline std::complex<floating_point_t> operator*(std::complex<floating_point_t> z, std::complex<floating_point_t> w)
 {
     return std::complex{ z.real() * w.real(), z.imag() * w.imag() };
 }
@@ -339,7 +341,7 @@ auto operator/(const std::vector<T1>& vec1, const std::vector<T2>& vec2)
 }
 
 
-inline std::complex<double> operator/(std::complex<double> z, std::complex<double> w)
+inline std::complex<floating_point_t> operator/(std::complex<floating_point_t> z, std::complex<floating_point_t> w)
 {
     auto x = z.real();
     auto y = z.imag();

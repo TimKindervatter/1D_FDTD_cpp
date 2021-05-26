@@ -9,17 +9,17 @@
 using GlobalConstants::c;
 using GlobalConstants::pi;
 
-inline void update_H(std::vector<double>& Hx, std::vector<double>& Ey, std::vector<double>& mHx, double dz, uint32_t Nz)
+inline void update_H(std::vector<floating_point_t>& Hx, std::vector<floating_point_t>& Ey, std::vector<floating_point_t>& mHx, floating_point_t dz, uint32_t Nz)
 {
-	for (int nz = 0; nz < Nz - 1; ++nz)
+	for (size_t nz = 0; nz < Nz - 1; ++nz)
 	{
 		Hx.at(nz) = Hx.at(nz) + mHx.at(nz) * (Ey.at(nz + 1) - Ey.at(nz)) / dz;
 	}
 }
 
-inline void update_E(std::vector<double>& Ey, std::vector<double>& Hx, std::vector<double>& mEy, double dz, uint32_t Nz)
+inline void update_E(std::vector<floating_point_t>& Ey, std::vector<floating_point_t>& Hx, std::vector<floating_point_t>& mEy, floating_point_t dz, uint32_t Nz)
 {
-	for (int nz = 1; nz < Nz; ++nz)
+	for (size_t nz = 1; nz < Nz; ++nz)
 	{
 		Ey.at(nz) = Ey.at(nz) + mEy.at(nz) * (Hx.at(nz) - Hx.at(nz - 1)) / dz;
 	}
@@ -30,24 +30,24 @@ void FDTD_engine()
 	// Define Problem
 	BraggGratingProblemInstance problem_instance{};
 
-	double max_frequency = problem_instance.max_frequency;
+	floating_point_t max_frequency = problem_instance.max_frequency;
 
 	uint32_t Nz = problem_instance.device.get_full_grid_size();
-	double dz = problem_instance.device.get_grid_resolution();
-	std::vector<double> grid = problem_instance.device.get_grid();
+	floating_point_t dz = problem_instance.device.get_grid_resolution();
+	std::vector<floating_point_t> grid = problem_instance.device.get_grid();
 
-	std::vector<double> epsilon_r = problem_instance.device.get_epsilon_r();
-	std::vector<double> mu_r = problem_instance.device.get_mu_r();
-	std::vector<double> n = problem_instance.device.get_index_of_refraction();
+	std::vector<floating_point_t> epsilon_r = problem_instance.device.get_epsilon_r();
+	std::vector<floating_point_t> mu_r = problem_instance.device.get_mu_r();
+	std::vector<floating_point_t> n = problem_instance.device.get_index_of_refraction();
 
-	double dt = compute_time_step(problem_instance.device);
+	floating_point_t dt = compute_time_step(problem_instance.device);
 
 	int source_location = 1;
 
 
 	// Compute source parameters
-	double tau{};
-	double t0{};
+	floating_point_t tau{};
+	floating_point_t t0{};
 	if (to_lower(problem_instance.source_type) == "cw")
 	{
 		tau = 3 / max_frequency;
@@ -55,24 +55,24 @@ void FDTD_engine()
 	}
 	else if (to_lower(problem_instance.source_type) == "pulse")
 	{
-		tau = 0.5 / max_frequency;
+		tau = 0.5f / max_frequency;
 		t0 = 6 * tau;
 	}
 	
 	// Compute number of time steps
-	double max_index_of_refraction = max(n, 1.0f);
-	double t_prop = max_index_of_refraction * Nz * dz / c;
+	floating_point_t max_index_of_refraction = max(n, 1.0f);
+	floating_point_t t_prop = max_index_of_refraction * Nz * dz / c;
 
-	double total_runtime = problem_instance.duration_multiplier * (12 * tau + 5 * t_prop);
+	floating_point_t total_runtime = problem_instance.duration_multiplier * (12 * tau + 5 * t_prop);
 	int steps = static_cast<int>(std::ceil(total_runtime / dt));
 
 	// Compute source functions for Ey/Hx mode
-	std::vector<double> t = arange(0, steps) * dt;
-	double A = std::sqrt(epsilon_r.at(source_location) / mu_r.at(source_location));
-	double deltat = n.at(source_location) * dz / (2.0f * c) + dt / 2;
+	std::vector<floating_point_t> t = arange(0, steps) * dt;
+	floating_point_t A = std::sqrt(epsilon_r.at(source_location) / mu_r.at(source_location));
+	floating_point_t deltat = n.at(source_location) * dz / (2.0f * c) + dt / 2;
 
-	std::vector<double> Eysrc;
-	std::vector<double> Hxsrc;
+	std::vector<floating_point_t> Eysrc;
+	std::vector<floating_point_t> Hxsrc;
 
 	if (to_lower(problem_instance.source_type) == "cw")
 	{
@@ -89,40 +89,40 @@ void FDTD_engine()
 	}
 	else if (to_lower(problem_instance.source_type) == "pulse")
 	{
-		std::vector<double> Ey_pulse = ((t - t0) / tau);
+		std::vector<floating_point_t> Ey_pulse = ((t - t0) / tau);
 		Eysrc = exp(-pow(Ey_pulse, 2));
 
-		std::vector<double> Hx_pulse = ((t - t0 + deltat) / tau);
+		std::vector<floating_point_t> Hx_pulse = ((t - t0 + deltat) / tau);
 		Hxsrc = -A*exp(-pow(Hx_pulse, 2));
 	}
 
 	// Initialize update coefficients
-	std::vector<double> mEy = (c * dt) / epsilon_r;
-	std::vector<double> mHx = (c * dt) / mu_r;
+	std::vector<floating_point_t> mEy = (c * dt) / epsilon_r;
+	std::vector<floating_point_t> mHx = (c * dt) / mu_r;
 
-	std::vector<double> Ey(Nz, 0.0);
-	std::vector<double> Hx(Nz, 0.0);
+	std::vector<floating_point_t> Ey(Nz, 0.0);
+	std::vector<floating_point_t> Hx(Nz, 0.0);
 
-	double h2 = 0.0;
-	double h1 = 0.0;
-	double e2 = 0.0;
-	double e1 = 0.0;
+	floating_point_t h2 = 0.0;
+	floating_point_t h1 = 0.0;
+	floating_point_t e2 = 0.0;
+	floating_point_t e1 = 0.0;
 
 	int num_frequencies = problem_instance.num_frequencies; 
-	double time_step = compute_time_step(problem_instance.device);
+	floating_point_t time_step = compute_time_step(problem_instance.device);
 
 	int m_num_frequencies{ num_frequencies };
-	double m_time_step{ time_step };
-	std::vector<double> m_frequencies{ linspace(0.0f, problem_instance.max_frequency, num_frequencies) };
-	std::vector<std::complex<double>> m_reflected_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
-	std::vector<std::complex<double>> m_transmitted_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
-	std::vector<std::complex<double>> m_source_fourier(num_frequencies, std::complex<double>{0.0, 0.0});
-	std::vector<double> m_reflectance(num_frequencies, 0.0);
-	std::vector<double> m_transmittance(num_frequencies, 0.0);
-	std::vector<double> m_conservation_of_energy(num_frequencies, 0.0);
+	floating_point_t m_time_step{ time_step };
+	std::vector<floating_point_t> m_frequencies{ linspace(0.0f, problem_instance.max_frequency, num_frequencies) };
+	std::vector<std::complex<floating_point_t>> m_reflected_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
+	std::vector<std::complex<floating_point_t>> m_transmitted_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
+	std::vector<std::complex<floating_point_t>> m_source_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
+	std::vector<floating_point_t> m_reflectance(num_frequencies, 0.0);
+	std::vector<floating_point_t> m_transmittance(num_frequencies, 0.0);
+	std::vector<floating_point_t> m_conservation_of_energy(num_frequencies, 0.0);
 
-	std::complex<double> imaginary_unit{ 0.0, 1.0 };
-	auto m_kernel = exp(imaginary_unit * 2.0 * pi * time_step * m_frequencies);
+	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
+	auto m_kernel = exp(imaginary_unit * 2.0f * pi * time_step * m_frequencies);
 
 	for (int T = 0; T < steps; ++T)
 	{

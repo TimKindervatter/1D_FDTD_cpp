@@ -1,9 +1,9 @@
 #include "Slab.h"
 
-Slab::Slab(double max_frequency)
+Slab::Slab(floating_point_t max_frequency)
 {
-	double device_width = 0.3048;
-	double spacer_region_width = device_width / 7.1;
+	floating_point_t device_width = 0.3048f;
+	floating_point_t spacer_region_width = device_width / 7.1f;
 
 	this->m_layer_widths = { spacer_region_width, device_width, spacer_region_width };
 	this->m_layer_permittivities = { 1.0, 6.0, 1.0 };

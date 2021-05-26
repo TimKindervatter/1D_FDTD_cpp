@@ -2,16 +2,16 @@
 
 #include <cmath>
 
-BraggGrating::BraggGrating(double max_frequency)
+BraggGrating::BraggGrating(floating_point_t max_frequency)
 {
-	double alternating_layer_1_width = 163e-9;
-	double alternating_layer_2_width = 122e-9;
-	double spacer_region_width = 100e-9;
+	floating_point_t alternating_layer_1_width = 163e-9f;
+	floating_point_t alternating_layer_2_width = 122e-9f;
+	floating_point_t spacer_region_width = 100e-9f;
 
-	double n1 = 1.5; // SiN
-	double n2 = 2.0; // SiO2
-	double er1 = std::pow(n1, 2); // SiN is non-magnetic (i.e. mur1 = 1.0, so er1 = n1^2)
-	double er2 = std::pow(n2, 2); // SiO2 is non-magnetic (i.e. mur2 = 1.0, so er2 = n2^2)
+	floating_point_t n1 = 1.5; // SiN
+	floating_point_t n2 = 2.0; // SiO2
+	floating_point_t er1 = std::pow(n1, 2); // SiN is non-magnetic (i.e. mur1 = 1.0, so er1 = n1^2)
+	floating_point_t er2 = std::pow(n2, 2); // SiO2 is non-magnetic (i.e. mur2 = 1.0, so er2 = n2^2)
 	int num_periods = 15;
 	
 	construct_grating_arrays(this->m_layer_widths, spacer_region_width, alternating_layer_1_width, alternating_layer_2_width, num_periods);
@@ -22,7 +22,7 @@ BraggGrating::BraggGrating(double max_frequency)
 	Device::initialize(max_frequency);
 }
 
-void BraggGrating::construct_grating_arrays(std::vector<double>& vec, double spacer_region_value, double grating_layer_1_value, double grating_layer_2_value, int num_periods)
+void BraggGrating::construct_grating_arrays(std::vector<floating_point_t>& vec, floating_point_t spacer_region_value, floating_point_t grating_layer_1_value, floating_point_t grating_layer_2_value, int num_periods)
 {
 	int num_grating_layers = 2 * num_periods; // Each period has one SiN layer and one SiO2 layer
 
