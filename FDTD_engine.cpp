@@ -122,7 +122,8 @@ void FDTD_engine()
 	std::vector<floating_point_t> m_conservation_of_energy(num_frequencies, 0.0);
 
 	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
-	auto m_kernel = exp(imaginary_unit * 2.0f * pi * time_step * m_frequencies);
+	auto two_pi_i =  2.0f * pi<floating_point_t> * imaginary_unit;
+	auto m_kernel = exp(two_pi_i * time_step * m_frequencies);
 
 	for (int T = 0; T < steps; ++T)
 	{
