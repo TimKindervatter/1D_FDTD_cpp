@@ -292,7 +292,12 @@ auto operator*(const std::vector<T1>& vec1, const std::vector<T2>& vec2)
 
 inline std::complex<floating_point_t> operator*(std::complex<floating_point_t> z, std::complex<floating_point_t> w)
 {
-    return std::complex{ z.real() * w.real(), z.imag() * w.imag() };
+    auto x = z.real();
+    auto y = z.imag();
+    auto u = w.real();
+    auto v = w.imag();
+
+    return std::complex{ x*u - y*v, x*v + y*u };
 }
 
 // /
