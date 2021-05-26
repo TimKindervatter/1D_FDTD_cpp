@@ -2,6 +2,8 @@
 #include "Utilities.h"
 #include "PythonUtilities.h"
 
+#include "Eigen\Core"
+
 #include <numeric>
 #include <cassert>
 #include <cmath>
@@ -115,8 +117,8 @@ void Device::generate_material_grid(Eigen::Array<floating_point_t, 1, Eigen::Dyn
 	{
 		auto [layer_start_index, layer_end_index] = compute_layer_start_and_end_indices(m_layer_sizes, i);
 
-		epsilon_r.segment(layer_start_index, layer_end_index) = m_layer_permittivities[i];
-		mu_r.segment(layer_start_index, layer_end_index) = m_layer_permeabilities[i];
+		epsilon_r(Eigen::seq(layer_start_index, layer_end_index)) = m_layer_permittivities[i];
+		mu_r(Eigen::seq(layer_start_index, layer_end_index)) = m_layer_permeabilities[i];
 	}
 }
 
@@ -130,8 +132,6 @@ void Device::generate_grid_1D(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>&
 
 std::pair<size_t, size_t> Device::compute_layer_start_and_end_indices(const Eigen::Array<uint32_t, 1, Eigen::Dynamic> layer_sizes, int i)
 {
-	std::cout << m_layer_sizes;
-
 	uint32_t offset = 2; // num_reflection_cells + num_source_cells
 	uint32_t layer_start_index = offset + m_layer_sizes.segment(0, i).sum();
 	uint32_t layer_end_index = offset + m_layer_sizes.segment(0, i + 1).sum();

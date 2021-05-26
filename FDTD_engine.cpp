@@ -69,8 +69,9 @@ void FDTD_engine()
 	int steps = static_cast<int>(std::ceil(total_runtime / dt));
 
 	// Compute source functions for Ey/Hx mode
-	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> t;
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> t(steps);
 	t.setLinSpaced(0, steps) * dt;
+
 	floating_point_t A = std::sqrt(epsilon_r[source_location] / mu_r[source_location]);
 	floating_point_t deltat = n[source_location] * dz / (2.0f * c) + dt / 2;
 
