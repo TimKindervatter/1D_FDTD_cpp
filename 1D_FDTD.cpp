@@ -25,7 +25,7 @@ int main()
 
         std::cout << "Run " << i << ": " << duration_seconds << " seconds\n";
     }
-
+        
     std::cout << "Average over " << SIZE << " runs: " << times.mean() << " seconds\n";
 
     return 0;

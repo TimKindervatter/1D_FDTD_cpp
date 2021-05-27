@@ -6,22 +6,24 @@
 #include "Utilities.h"
 #include "PythonUtilities.h"
 
+#include "Eigen\Dense"
+
 using GlobalConstants::c;
 using GlobalConstants::pi;
 
-inline void update_H(std::vector<floating_point_t>& Hx, std::vector<floating_point_t>& Ey, std::vector<floating_point_t>& mHx, floating_point_t dz, uint32_t Nz)
+inline void update_H(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Hx, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& mHx, floating_point_t dz, uint32_t Nz)
 {
 	for (size_t nz = 0; nz < Nz - 1; ++nz)
 	{
-		Hx.at(nz) = Hx.at(nz) + mHx.at(nz) * (Ey.at(nz + 1) - Ey.at(nz)) / dz;
+		Hx[nz] = Hx[nz] + mHx[nz] * (Ey[nz + 1] - Ey[nz]) / dz;
 	}
 }
 
-inline void update_E(std::vector<floating_point_t>& Ey, std::vector<floating_point_t>& Hx, std::vector<floating_point_t>& mEy, floating_point_t dz, uint32_t Nz)
+inline void update_E(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Hx, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& mEy, floating_point_t dz, uint32_t Nz)
 {
 	for (size_t nz = 1; nz < Nz; ++nz)
 	{
-		Ey.at(nz) = Ey.at(nz) + mEy.at(nz) * (Hx.at(nz) - Hx.at(nz - 1)) / dz;
+		Ey[nz] = Ey[nz] + mEy[nz] * (Hx[nz] - Hx[nz - 1]) / dz;
 	}
 }
 
@@ -34,11 +36,11 @@ void FDTD_engine()
 
 	uint32_t Nz = problem_instance.device.get_full_grid_size();
 	floating_point_t dz = problem_instance.device.get_grid_resolution();
-	std::vector<floating_point_t> grid = problem_instance.device.get_grid();
+	auto grid = problem_instance.device.get_grid();
 
-	std::vector<floating_point_t> epsilon_r = problem_instance.device.get_epsilon_r();
-	std::vector<floating_point_t> mu_r = problem_instance.device.get_mu_r();
-	std::vector<floating_point_t> n = problem_instance.device.get_index_of_refraction();
+	auto epsilon_r = problem_instance.device.get_epsilon_r();
+	auto mu_r = problem_instance.device.get_mu_r();
+	auto n = problem_instance.device.get_index_of_refraction();
 
 	floating_point_t dt = compute_time_step(problem_instance.device);
 
@@ -60,19 +62,21 @@ void FDTD_engine()
 	}
 	
 	// Compute number of time steps
-	floating_point_t max_index_of_refraction = max(n, 1.0f);
+	floating_point_t max_index_of_refraction = n.maxCoeff();
 	floating_point_t t_prop = max_index_of_refraction * Nz * dz / c;
 
 	floating_point_t total_runtime = problem_instance.duration_multiplier * (12 * tau + 5 * t_prop);
 	int steps = static_cast<int>(std::ceil(total_runtime / dt));
 
 	// Compute source functions for Ey/Hx mode
-	std::vector<floating_point_t> t = arange(0, steps) * dt;
-	floating_point_t A = std::sqrt(epsilon_r.at(source_location) / mu_r.at(source_location));
-	floating_point_t deltat = n.at(source_location) * dz / (2.0f * c) + dt / 2;
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> t(steps);
+	t.setLinSpaced(0, steps) * dt;
 
-	std::vector<floating_point_t> Eysrc;
-	std::vector<floating_point_t> Hxsrc;
+	floating_point_t A = std::sqrt(epsilon_r[source_location] / mu_r[source_location]);
+	floating_point_t deltat = n[source_location] * dz / (2.0f * c) + dt / 2;
+
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Eysrc;
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hxsrc;
 
 	if (to_lower(problem_instance.source_type) == "cw")
 	{
@@ -89,19 +93,19 @@ void FDTD_engine()
 	}
 	else if (to_lower(problem_instance.source_type) == "pulse")
 	{
-		std::vector<floating_point_t> Ey_pulse = ((t - t0) / tau);
+		Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Ey_pulse = ((t - t0) / tau);
 		Eysrc = exp(-pow(Ey_pulse, 2));
 
-		std::vector<floating_point_t> Hx_pulse = ((t - t0 + deltat) / tau);
+		Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hx_pulse = ((t - t0 + deltat) / tau);
 		Hxsrc = -A*exp(-pow(Hx_pulse, 2));
 	}
 
 	// Initialize update coefficients
-	std::vector<floating_point_t> mEy = (c * dt) / epsilon_r;
-	std::vector<floating_point_t> mHx = (c * dt) / mu_r;
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> mEy = (c * dt) / epsilon_r;
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> mHx = (c * dt) / mu_r;
 
-	std::vector<floating_point_t> Ey(Nz, 0.0);
-	std::vector<floating_point_t> Hx(Nz, 0.0);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Ey(Nz);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hx(Nz);
 
 	floating_point_t h2 = 0.0;
 	floating_point_t h1 = 0.0;
@@ -113,17 +117,19 @@ void FDTD_engine()
 
 	int m_num_frequencies{ num_frequencies };
 	floating_point_t m_time_step{ time_step };
-	std::vector<floating_point_t> m_frequencies{ linspace(0.0f, problem_instance.max_frequency, num_frequencies) };
-	std::vector<std::complex<floating_point_t>> m_reflected_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
-	std::vector<std::complex<floating_point_t>> m_transmitted_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
-	std::vector<std::complex<floating_point_t>> m_source_fourier(num_frequencies, std::complex<floating_point_t>{0.0, 0.0});
-	std::vector<floating_point_t> m_reflectance(num_frequencies, 0.0);
-	std::vector<floating_point_t> m_transmittance(num_frequencies, 0.0);
-	std::vector<floating_point_t> m_conservation_of_energy(num_frequencies, 0.0);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_frequencies;
+	m_frequencies.conservativeResize(num_frequencies);
+	m_frequencies.setLinSpaced(num_frequencies, 0.0f, problem_instance.max_frequency);
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_reflected_fourier(num_frequencies);
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_transmitted_fourier(num_frequencies);
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_source_fourier(num_frequencies);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_reflectance(num_frequencies);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_transmittance(num_frequencies);
+	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_conservation_of_energy(num_frequencies);
 
 	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
-	auto two_pi_i =  2.0f * pi<floating_point_t> * imaginary_unit;
-	auto m_kernel = exp(two_pi_i * time_step * m_frequencies);
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f = imaginary_unit * 2.0f * pi<floating_point_t> * time_step * m_frequencies;
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel = two_pi_i_f.exp();
 
 	for (int T = 0; T < steps; ++T)
 	{
@@ -133,28 +139,27 @@ void FDTD_engine()
 
 		// Record H at boundary
 		h2 = h1;
-		h1 = Hx.at(0);
+		h1 = Hx[0];
 
 		// Update H from E
 		update_H(Hx, Ey, mHx, dz, Nz);
-		Hx.at(Nz - 1) = Hx.at(Nz - 1) + mHx.at(Nz - 1) * (e2 - Ey.at(Nz - 1)) / dz;
+		Hx[Nz - 1] = Hx[Nz - 1] + mHx[Nz - 1] * (e2 - Ey[Nz - 1]) / dz;
 
 		// Handle H-field source
-		Hx.at(source_location - 1) = Hx.at(source_location - 1) - (mHx.at(source_location - 1) / dz) * Eysrc.at(T);
+		Hx[source_location - 1] = Hx[source_location - 1] - (mHx[source_location - 1] / dz) * Eysrc[T];
 
 		// Record E at boundary
 		e2 = e1;
-		e1 = Ey.at(Nz - 1);
+		e1 = Ey[Nz - 1];
 
 		// Update E from H
-		Ey.at(0) = Ey.at(0) + mEy.at(0) * (Hx.at(0) - h2) / dz;
+		Ey[0] = Ey[0] + mEy[0] * (Hx[0] - h2) / dz;
 		update_E(Ey, Hx, mEy, dz, Nz);
 
 		// Handle E-field source
-		Ey.at(source_location) = Ey.at(source_location) - (mEy.at(source_location) / dz) * Hxsrc.at(T);
+		Ey[source_location] = Ey[source_location] - (mEy[source_location] / dz) * Hxsrc[T];
 
-
-		auto m_kernel_pow = pow(m_kernel, T);
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = m_kernel.pow(T);
 		auto Ey0 = Ey[0];
 		auto EyNz = Ey[Nz - 1];
 		auto EysrcT = Eysrc[T];
@@ -166,11 +171,11 @@ void FDTD_engine()
 			m_source_fourier[f] += m_kernel_pow[f] * EysrcT;
 		}
 
-		auto reflected_fraction = m_reflected_fourier / m_source_fourier;
-		m_reflectance = squared_magnitude(reflected_fraction);
+		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> reflected_fraction = m_reflected_fourier / m_source_fourier;
+		m_reflectance = reflected_fraction.squaredNorm();
 
-		auto transmitted_fraction = m_transmitted_fourier / m_source_fourier;
-		m_transmittance = squared_magnitude(transmitted_fraction);
+		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
+		m_transmittance = transmitted_fraction.squaredNorm();
 		m_conservation_of_energy = m_reflectance + m_transmittance;
 
 		m_reflected_fourier = m_reflected_fourier * m_time_step;
