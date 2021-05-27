@@ -159,44 +159,23 @@ void FDTD_engine()
 		// Handle E-field source
 		Ey[source_location] = Ey[source_location] - (mEy[source_location] / dz) * Hxsrc[T];
 
-		Eigen::Array < std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = m_kernel.pow(T);
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = m_kernel.pow(T);
+		auto Ey0 = Ey[0];
+		auto EyNz = Ey[Nz - 1];
+		auto EysrcT = Eysrc[T];
 
 		for (int f = 0; f < m_num_frequencies; ++f)
 		{
-			//std::complex<floating_point_t> elem = m_kernel[f];
-			//auto kernel_f_pow = pow(elem, T);
-
-
-			//auto kernel_f_real = m_kernel.at(f).real();
-			//auto kernel_f_real_pow = pow(m_kernel.at(f), T);
-
-			//auto kernel_f_imag = m_kernel.at(f).imag();
-			//auto kernel_f_imag_pow = pow(kernel_f_imag, T);
-
-			auto Ey0 = Ey[0];
-			//auto reflected_real = kernel_f_real_pow * Ey0;
-			//auto reflected_imag = kernel_f_imag_pow * Ey0;
-			//m_reflected_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
 			m_reflected_fourier[f] += m_kernel_pow[f] * Ey0;
-
-			auto EyNz = Ey[Nz - 1];
-			//auto transmitted_real = kernel_f_real_pow * EyNz;
-			//auto transmitted_imag = kernel_f_imag_pow * EyNz;
-			//m_transmitted_fourier.at(f) += std::complex{ reflected_real, reflected_imag };
 			m_transmitted_fourier[f] += m_kernel_pow[f] * EyNz;
-
-			auto EysrcT = Eysrc[T];
-			/*auto source_real = kernel_f_real_pow * EysrcT;
-			auto source_imag = kernel_f_imag_pow * EysrcT;
-			m_source_fourier.at(f) += std::complex{ source_real, source_imag };*/
 			m_source_fourier[f] += m_kernel_pow[f] * EysrcT;
 		}
 
-		auto reflected_fraction = m_reflected_fourier / m_source_fourier;
-		m_reflectance = reflected_fraction.abs().sqrt();
+		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> reflected_fraction = m_reflected_fourier / m_source_fourier;
+		m_reflectance = reflected_fraction.squaredNorm();
 
-		auto transmitted_fraction = m_transmitted_fourier / m_source_fourier;
-		m_transmittance = transmitted_fraction.abs().sqrt();
+		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
+		m_transmittance = transmitted_fraction.squaredNorm();
 		m_conservation_of_energy = m_reflectance + m_transmittance;
 
 		m_reflected_fourier = m_reflected_fourier * m_time_step;
