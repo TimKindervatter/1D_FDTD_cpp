@@ -2,15 +2,19 @@
 #include <cmath>
 #include <iostream>
 
+#include "Eigen\Dense"
+#include "matplotlibcpp.h"
+
 #include "ProblemInstances.h"
 #include "Utilities.h"
 #include "PythonUtilities.h"
 
-#include "Eigen\Dense"
 #include "FDTD_engine.h"
 
 using GlobalConstants::c;
 using GlobalConstants::two_pi;
+
+namespace plt = matplotlibcpp;
 
 inline void update_H(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Hx, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& mHx, floating_point_t dz, uint32_t Nz)
 {
@@ -31,8 +35,10 @@ inline void update_E(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eige
 
 void FDTD_engine()
 {
+	plt::backend("WXAgg");
+
 	// Define Problem
-	BraggGratingProblemInstance problem_instance{};
+	SlabProblemInstance problem_instance{};
 
 	floating_point_t max_frequency = problem_instance.max_frequency;
 
@@ -196,6 +202,16 @@ void FDTD_engine()
 		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
 		m_transmittance = transmitted_fraction.squaredNorm();
 		m_conservation_of_energy = m_reflectance + m_transmittance;
+
+		if (T % 10 == 0)
+		{
+			plt::clf();
+			plt::plot(grid, Ey);
+			plt::plot(grid, Hx);
+			plt::xlim(grid[0], grid[grid.size() - 1]);
+			plt::ylim(problem_instance.ymin, problem_instance.ymax);
+			plt::pause(0.0001);
+		}
 	}
 
 	m_reflected_fourier = m_reflected_fourier * time_step;

@@ -12,7 +12,7 @@ int main()
     Eigen::setNbThreads(std::thread::hardware_concurrency());
     std::cout << "Num threads: " << Eigen::nbThreads() << '\n';
 
-    constexpr int SIZE = 10;
+    constexpr int SIZE = 1;
 
     Eigen::Array<double, 1, SIZE> times;
 
