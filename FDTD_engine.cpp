@@ -75,7 +75,7 @@ void FDTD_engine()
 	t = t.setLinSpaced(0, steps) * dt;
 
 	floating_point_t A = std::sqrt(epsilon_r[source_location] / mu_r[source_location]);
-	floating_point_t deltat = n[source_location] * dz / (2.0 * c) + dt / 2;
+	floating_point_t deltat = n[source_location] * dz / (2.0f * c) + dt / 2;
 
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Eysrc;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hxsrc;
