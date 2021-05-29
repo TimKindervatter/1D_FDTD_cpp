@@ -129,7 +129,6 @@ void FDTD_engine()
 
 	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
 	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f = imaginary_unit * 2.0f * pi<floating_point_t> * time_step * m_frequencies;
-	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel = two_pi_i_f.exp();
 
 	for (int T = 0; T < steps; ++T)
 	{
