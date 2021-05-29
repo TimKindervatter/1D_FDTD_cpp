@@ -7,6 +7,7 @@
 #include "PythonUtilities.h"
 
 #include "Eigen\Dense"
+#include "FDTD_engine.h"
 
 using GlobalConstants::c;
 using GlobalConstants::pi;
@@ -26,6 +27,7 @@ inline void update_E(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eige
 		Ey[nz] = Ey[nz] + mEy[nz] * (Hx[nz] - Hx[nz - 1]) / dz;
 	}
 }
+
 
 void FDTD_engine()
 {
@@ -162,27 +164,7 @@ void FDTD_engine()
 		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f_T = two_pi_i_f * T;
 		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow(two_pi_i_f_T.size());
 
-		#pragma omp parallel
-		{
-			int num_threads = Eigen::nbThreads();
-			int thread_ID = omp_get_thread_num();
-			int num_elements = two_pi_i_f_T.size();
-			int elements_per_thread = num_elements / num_threads;
-
-			if (elements_per_thread * num_threads < num_elements)
-				elements_per_thread++;
-
-			int start = thread_ID * elements_per_thread;
-
-			int length = elements_per_thread;
-			if (thread_ID + 1 == num_threads)
-				length = num_elements - start;
-
-			if (start < num_elements)
-			{
-				m_kernel_pow.segment(start, length) = Eigen::exp(two_pi_i_f_T.segment(start, length));
-			}
-		}
+		parallelize_unary_array_operation(two_pi_i_f_T, m_kernel_pow, [](auto array) { return Eigen::exp(array); });
 
 		auto Ey0 = Ey[0];
 		auto EyNz = Ey[Nz - 1];
