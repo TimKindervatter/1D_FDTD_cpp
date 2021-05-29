@@ -96,10 +96,10 @@ void FDTD_engine()
 	else if (to_lower(problem_instance.source_type) == "pulse")
 	{
 		Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Ey_pulse = ((t - t0) / tau);
-		Eysrc = exp(-pow(Ey_pulse, 2));
+		Eysrc = Eigen::exp(-(Ey_pulse * Ey_pulse));
 
 		Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hx_pulse = ((t - t0 + deltat) / tau);
-		Hxsrc = -A*exp(-pow(Hx_pulse, 2));
+		Hxsrc = -A*Eigen::exp(-(Hx_pulse * Hx_pulse));
 	}
 
 	// Initialize update coefficients
