@@ -159,7 +159,9 @@ void FDTD_engine()
 		// Handle E-field source
 		Ey[source_location] = Ey[source_location] - (mEy[source_location] / dz) * Hxsrc[T];
 
-		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = m_kernel.pow(T);
+		// Stupidly, this is faster than .pow(T) because Eigen vectorizes .log(), *, and .exp(), but not .pow()
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = (m_kernel.log() * T).exp();
+
 		auto Ey0 = Ey[0];
 		auto EyNz = Ey[Nz - 1];
 		auto EysrcT = Eysrc[T];
