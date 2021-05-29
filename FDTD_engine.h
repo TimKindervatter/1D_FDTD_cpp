@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utilities.h"
+#include "ProblemInstanceIncludes.h"
 
 template <typename InArrayType, typename OutArrayType, typename Callable>
 void parallelize_unary_array_operation(InArrayType& input_array, OutArrayType& output_array, Callable f)

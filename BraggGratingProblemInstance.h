@@ -3,9 +3,9 @@
 #include <string>
 
 #include "BraggGrating.h"
-#include "FourierTransform.h"
+#include "ProblemInstance.h"
 
-struct BraggGratingProblemInstance
+struct BraggGratingProblemInstance : public ProblemInstance
 {
 	floating_point_t max_frequency{ 1.5e15f }; // Hz
 	BraggGrating device = BraggGrating(max_frequency);

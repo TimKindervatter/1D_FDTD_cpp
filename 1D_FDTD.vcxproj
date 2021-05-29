@@ -190,11 +190,11 @@
     <ClInclude Include="BraggGratingProblemInstance.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="FDTD_engine.h" />
-    <ClInclude Include="ProblemInstances.h" />
+    <ClInclude Include="ProblemInstance.h" />
+    <ClInclude Include="ProblemInstanceIncludes.h" />
     <ClInclude Include="Slab.h" />
     <ClInclude Include="SlabProblemInstance.h" />
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="PythonUtilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
