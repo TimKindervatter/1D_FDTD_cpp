@@ -56,3 +56,5 @@ void parallelize_binary_array_operation(InArray1Type& input_array1, InArray2Type
 }
 
 void FDTD_engine();
+
+void plot_fields(int T, Eigen::Array<floating_point_t, 1, -1>& grid, Eigen::Array<floating_point_t, 1, -1>& Ey, Eigen::Array<floating_point_t, 1, -1>& Hx, ProblemInstance& problem_instance);
