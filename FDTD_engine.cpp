@@ -180,7 +180,7 @@ void FDTD_engine()
 
 			if (start < num_elements)
 			{
-				m_kernel_pow.segment(start, length) = two_pi_i_f_T.exp();
+				m_kernel_pow.segment(start, length) = Eigen::exp(two_pi_i_f_T.segment(start, length));
 			}
 		}
 
