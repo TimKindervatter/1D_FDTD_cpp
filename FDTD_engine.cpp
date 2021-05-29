@@ -10,7 +10,7 @@
 #include "FDTD_engine.h"
 
 using GlobalConstants::c;
-using GlobalConstants::pi;
+using GlobalConstants::two_pi;
 
 inline void update_H(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Hx, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& mHx, floating_point_t dz, uint32_t Nz)
 {
@@ -72,10 +72,10 @@ void FDTD_engine()
 
 	// Compute source functions for Ey/Hx mode
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> t(steps);
-	t.setLinSpaced(0, steps) * dt;
+	t = t.setLinSpaced(0, steps) * dt;
 
 	floating_point_t A = std::sqrt(epsilon_r[source_location] / mu_r[source_location]);
-	floating_point_t deltat = n[source_location] * dz / (2.0f * c) + dt / 2;
+	floating_point_t deltat = n[source_location] * dz / (2.0 * c) + dt / 2;
 
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Eysrc;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hxsrc;
@@ -107,7 +107,9 @@ void FDTD_engine()
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> mHx = (c * dt) / mu_r;
 
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Ey(Nz);
+	Ey.fill(0.0);
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> Hx(Nz);
+	Hx.fill(0.0);
 
 	floating_point_t h2 = 0.0;
 	floating_point_t h1 = 0.0;
@@ -115,22 +117,33 @@ void FDTD_engine()
 	floating_point_t e1 = 0.0;
 
 	int num_frequencies = problem_instance.num_frequencies; 
-	floating_point_t time_step = compute_time_step(problem_instance.device);
 
 	int m_num_frequencies{ num_frequencies };
-	floating_point_t m_time_step{ time_step };
+	floating_point_t time_step{ compute_time_step(problem_instance.device) };
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_frequencies;
 	m_frequencies.conservativeResize(num_frequencies);
 	m_frequencies.setLinSpaced(num_frequencies, 0.0f, problem_instance.max_frequency);
+
 	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_reflected_fourier(num_frequencies);
+	m_reflected_fourier.fill(0.0);
+
 	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_transmitted_fourier(num_frequencies);
+	m_transmitted_fourier.fill(0.0);
+
 	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_source_fourier(num_frequencies);
+	m_source_fourier.fill(0.0);
+
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_reflectance(num_frequencies);
+	m_reflectance.fill(0.0);
+
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_transmittance(num_frequencies);
+	m_transmittance.fill(0.0);
+
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_conservation_of_energy(num_frequencies);
+	m_conservation_of_energy.fill(0.0);
 
 	std::complex<floating_point_t> imaginary_unit{ 0.0, 1.0 };
-	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f = imaginary_unit * 2.0f * pi<floating_point_t> * time_step * m_frequencies;
+	Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f = imaginary_unit * two_pi<floating_point_t> * time_step * m_frequencies;
 
 	for (int T = 0; T < steps; ++T)
 	{
@@ -183,11 +196,16 @@ void FDTD_engine()
 		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
 		m_transmittance = transmitted_fraction.squaredNorm();
 		m_conservation_of_energy = m_reflectance + m_transmittance;
-
-		m_reflected_fourier = m_reflected_fourier * m_time_step;
-		m_transmitted_fourier = m_transmitted_fourier * m_time_step;
-		m_source_fourier = m_source_fourier * m_time_step;
 	}
 
+	m_reflected_fourier = m_reflected_fourier * time_step;
+	m_transmitted_fourier = m_transmitted_fourier * time_step;
+	m_source_fourier = m_source_fourier * time_step;
+
+#ifdef DEBUG
+	std::cout << m_reflected_fourier << "\n\n";
+	std::cout << m_transmitted_fourier << "\n\n";
+	std::cout << m_source_fourier << "\n\n";
+#endif
 	return;
 }

@@ -13,6 +13,9 @@ namespace GlobalConstants
 
 	template<typename T>
 	constexpr T pi = T(3.14159265358979323846);
+
+	template<typename T>
+	constexpr T two_pi = T(2.0 * pi<T>);
 }
 
 floating_point_t compute_time_step(const Device& device);
