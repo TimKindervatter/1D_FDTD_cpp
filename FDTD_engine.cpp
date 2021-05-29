@@ -161,7 +161,29 @@ void FDTD_engine()
 
 		// Stupidly, this is faster than .pow(T) because Eigen vectorizes *, and .exp(), but not .pow()
 		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> two_pi_i_f_T = two_pi_i_f * T;
-		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow = two_pi_i_f_T.exp();
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> m_kernel_pow(two_pi_i_f_T.size());
+
+		#pragma omp parallel
+		{
+			int num_threads = Eigen::nbThreads();
+			int thread_ID = omp_get_thread_num();
+			int num_elements = two_pi_i_f_T.size();
+			int elements_per_thread = num_elements / num_threads;
+
+			if (elements_per_thread * num_threads < num_elements)
+				elements_per_thread++;
+
+			int start = thread_ID * elements_per_thread;
+
+			int length = elements_per_thread;
+			if (thread_ID + 1 == num_threads)
+				length = num_elements - start;
+
+			if (start < num_elements)
+			{
+				m_kernel_pow.segment(start, length) = two_pi_i_f_T.exp();
+			}
+		}
 
 		auto Ey0 = Ey[0];
 		auto EyNz = Ey[Nz - 1];

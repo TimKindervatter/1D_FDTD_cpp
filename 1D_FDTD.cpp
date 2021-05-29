@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <thread>
 
 #include "Eigen\Dense"
 
@@ -8,6 +9,9 @@
 
 int main()
 {
+    Eigen::setNbThreads(std::thread::hardware_concurrency());
+    std::cout << "Num threads: " << Eigen::nbThreads() << '\n';
+
     constexpr int SIZE = 10;
 
     Eigen::Array<double, 1, SIZE> times;
