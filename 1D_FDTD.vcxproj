@@ -190,7 +190,6 @@
     <ClInclude Include="BraggGratingProblemInstance.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="FDTD_engine.h" />
-    <ClInclude Include="ProblemInstance.h" />
     <ClInclude Include="ProblemInstanceIncludes.h" />
     <ClInclude Include="Slab.h" />
     <ClInclude Include="SlabProblemInstance.h" />

@@ -3,9 +3,8 @@
 #include <string>
 
 #include "Slab.h"
-#include "ProblemInstance.h"
 
-struct SlabProblemInstance : public ProblemInstance
+struct SlabProblemInstance
 {
 	floating_point_t max_frequency{1e9f}; // Hz
 	Slab device = Slab(max_frequency);

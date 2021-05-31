@@ -68,9 +68,6 @@
     <ClInclude Include="ProblemInstanceIncludes.h">
       <Filter>Header Files\ProblemInstances</Filter>
     </ClInclude>
-    <ClInclude Include="ProblemInstance.h">
-      <Filter>Header Files\ProblemInstances</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\..\Eigen\eigen\debug\msvc\eigen.natvis" />
