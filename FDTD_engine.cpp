@@ -4,7 +4,14 @@
 #include <thread>
 
 #include "Eigen\Dense"
+
+#ifdef _DEBUG
+#undef _DEBUG
 #include "matplotlibcpp.h"
+#define _DEBUG
+#else
+#include "matplotlibcpp.h"
+#endif
 
 #include "ProblemInstanceIncludes.h"
 #include "Utilities.h"
