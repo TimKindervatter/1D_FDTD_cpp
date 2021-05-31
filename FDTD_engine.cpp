@@ -39,21 +39,6 @@ inline void update_E(Eigen::Array<floating_point_t, 1, Eigen::Dynamic>& Ey, Eige
 	}
 }
 
-void plot_fields(int T, Eigen::Array<floating_point_t, 1, -1>& grid, Eigen::Array<floating_point_t, 1, -1>& Ey, Eigen::Array<floating_point_t, 1, -1>& Hx, SlabProblemInstance& problem_instance)
-{
-	if (T % problem_instance.plot_update_interval == 0)
-	{
-		plt::clf();
-		plt::subplot(2, 1, 1);
-		plt::plot(grid, Ey);
-		plt::subplot(2, 1, 2);
-		plt::plot(grid, Hx);
-		plt::xlim(grid[0], grid[grid.size() - 1]);
-		plt::ylim(problem_instance.ymin, problem_instance.ymax);
-		plt::pause(0.000000000001);
-	}
-}
-
 void FDTD_engine()
 {
 	plt::backend("WXAgg");

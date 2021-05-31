@@ -59,4 +59,52 @@ void parallelize_binary_array_operation(InArray1Type& input_array1, InArray2Type
 
 void FDTD_engine();
 
-void plot_fields(int T, Eigen::Array<floating_point_t, 1, -1>& grid, Eigen::Array<floating_point_t, 1, -1>& Ey, Eigen::Array<floating_point_t, 1, -1>& Hx, ProblemInstance& problem_instance);
+template <typename ProblemInstance>
+void plot_fields(int T,
+	Eigen::Array<floating_point_t, 1, -1>& grid,
+	Eigen::Array<floating_point_t, 1, -1>& Ey,
+	Eigen::Array<floating_point_t, 1, -1>& Hx,
+	ProblemInstance& problem_instance,
+	Eigen::Array<floating_point_t, 1, -1>& frequencies,
+	Eigen::Array<floating_point_t, 1, -1>& reflectance,
+	Eigen::Array<floating_point_t, 1, -1>& transmittance,
+	Eigen::Array<floating_point_t, 1, -1>& conservation_of_energy)
+{
+	if (T % problem_instance.plot_update_interval == 0)
+	{
+
+
+		plt::clf();
+
+		plt::subplot(2, 1, 1);
+		plt::plot(grid, Ey);
+		plt::plot(grid, Hx);
+		plt::xlim(grid[0], grid[grid.size() - 1]);
+		plt::ylim(problem_instance.ymin, problem_instance.ymax);
+
+		if (to_lower(problem_instance.axis_scaling) == "linear")
+		{
+			plt::subplot(2, 1, 2);
+			plt::plot(frequencies, reflectance, std::map<std::string, std::string>{ {"label", "Reflectance"}});
+			plt::plot(frequencies, transmittance, std::map<std::string, std::string>{ {"label", "Transmittance"}});
+			plt::plot(frequencies, conservation_of_energy, std::map<std::string, std::string>{ {"label", "Conservation"}});
+			plt::xlim(static_cast<floating_point_t>(0.0), problem_instance.max_frequency);
+			plt::ylim(0.0, 1.5);
+			plt::legend();
+		}
+		else if (to_lower(problem_instance.axis_scaling) == "logarithmic")
+		{
+			Eigen::Array<floating_point_t, 1, -1> log_reflectance = 10 * reflectance.log10();
+			Eigen::Array<floating_point_t, 1, -1> log_transmittance = 10 * transmittance.log10();
+			Eigen::Array<floating_point_t, 1, -1> log_conservation_of_energy = 10 * conservation_of_energy;
+
+			plt::subplot(2, 1, 2);
+			plt::plot(frequencies, log_reflectance, std::map<std::string, std::string>{ {"label", "Reflectance"}});
+			plt::plot(frequencies, log_transmittance, std::map<std::string, std::string>{ {"label", "Transmittance"}});
+			plt::plot(frequencies, log_conservation_of_energy, std::map<std::string, std::string>{ {"label", "Conservation"}});
+			plt::legend();
+		}
+
+		plt::pause(0.000000000001);
+	}
+}
