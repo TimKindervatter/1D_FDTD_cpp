@@ -12,7 +12,11 @@ int main()
     Eigen::setNbThreads(std::thread::hardware_concurrency());
     std::cout << "Num threads: " << Eigen::nbThreads() << '\n';
 
+#ifdef PLOT
     constexpr int SIZE = 1;
+#else
+    constexpr int SIZE = 10;
+#endif
 
     Eigen::Array<double, 1, SIZE> times;
 
