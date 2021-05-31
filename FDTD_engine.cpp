@@ -202,14 +202,17 @@ void FDTD_engine()
 			m_source_fourier[f] += m_kernel_pow[f] * EysrcT;
 		}
 
-		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> reflected_fraction = m_reflected_fourier / m_source_fourier;
-		m_reflectance = reflected_fraction.squaredNorm();
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> reflected_fraction = m_reflected_fourier / m_source_fourier;
+		m_reflectance = reflected_fraction.array().abs().square();
 
-		Eigen::Matrix<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
-		m_transmittance = transmitted_fraction.squaredNorm();
+		Eigen::Array<std::complex<floating_point_t>, 1, Eigen::Dynamic> transmitted_fraction = m_transmitted_fourier / m_source_fourier;
+		m_transmittance = transmitted_fraction.array().abs().square();
+
 		m_conservation_of_energy = m_reflectance + m_transmittance;
 
-		plot_fields(T, grid, Ey, Hx, problem_instance);
+#ifdef PLOT
+		plot_fields(T, grid, Ey, Hx, problem_instance, m_frequencies, m_reflectance, m_transmittance, m_conservation_of_energy);
+#endif
 	}
 
 	m_reflected_fourier = m_reflected_fourier * time_step;
