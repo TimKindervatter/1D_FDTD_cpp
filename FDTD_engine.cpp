@@ -44,7 +44,7 @@ void FDTD_engine()
 	plt::backend("WXAgg");
 
 	// Define Problem
-	SlabProblemInstance problem_instance{};
+	BraggGratingProblemInstance problem_instance{};
 
 	floating_point_t max_frequency = problem_instance.max_frequency;
 

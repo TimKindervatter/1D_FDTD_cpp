@@ -3,7 +3,9 @@
 #include "Utilities.h"
 #include "ProblemInstanceIncludes.h"
 
-#define PLOT
+//#define PLOT
+
+// See here for info on this openMP parallelization code: https://stackoverflow.com/questions/41845724/eigen-openmp-no-parallelisation-due-to-false-sharing-and-thread-overhead
 
 template <typename InArrayType, typename OutArrayType, typename Callable>
 void parallelize_unary_array_operation(InArrayType& input_array, OutArrayType& output_array, Callable f)
