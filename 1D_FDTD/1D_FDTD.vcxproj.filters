@@ -44,9 +44,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PythonUtilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Device.h">
       <Filter>Header Files\Devices</Filter>
     </ClInclude>
@@ -68,8 +65,11 @@
     <ClInclude Include="BraggGrating.h">
       <Filter>Header Files\Devices</Filter>
     </ClInclude>
-    <ClInclude Include="ProblemInstances.h">
+    <ClInclude Include="ProblemInstanceIncludes.h">
       <Filter>Header Files\ProblemInstances</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\..\Eigen\eigen\debug\msvc\eigen.natvis" />
   </ItemGroup>
 </Project>

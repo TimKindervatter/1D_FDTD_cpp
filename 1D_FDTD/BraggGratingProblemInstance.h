@@ -3,7 +3,6 @@
 #include <string>
 
 #include "BraggGrating.h"
-#include "FourierTransform.h"
 
 struct BraggGratingProblemInstance
 {

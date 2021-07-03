@@ -1,6 +1,5 @@
 #include "Device.h"
 #include "Utilities.h"
-#include "PythonUtilities.h"
 
 #include "Eigen\Core"
 
@@ -81,7 +80,7 @@ Eigen::Array<uint32_t, 1, Eigen::Dynamic> Device::compute_layer_sizes()
 	auto num_layer_widths = m_layer_widths.size();
 	layer_sizes.conservativeResize(num_layer_widths);
 
-	for (size_t i = 0; i < num_layer_widths; ++ i)
+	for (int i = 0; i < num_layer_widths; ++ i)
 	{
 		layer_sizes[i] = static_cast<uint32_t>(std::ceil(m_layer_widths[i] / m_grid_resolution));
 	}
@@ -113,7 +112,7 @@ void Device::generate_material_grid(Eigen::Array<floating_point_t, 1, Eigen::Dyn
 	mu_r.resize(m_full_grid_size);
 	mu_r.fill(1.0f);
 
-	for (size_t i = 0; i < m_layer_sizes.size(); ++i)
+	for (int i = 0; i < m_layer_sizes.size(); ++i)
 	{
 		auto [layer_start_index, layer_end_index] = compute_layer_start_and_end_indices(m_layer_sizes, i);
 

@@ -38,9 +38,9 @@ protected:
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_layer_permittivities;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_layer_permeabilities;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_layer_refractive_indices;
-	floating_point_t m_grid_resolution;
+	floating_point_t m_grid_resolution{};
 	Eigen::Array<uint32_t, 1, Eigen::Dynamic> m_layer_sizes;
-	uint32_t m_full_grid_size;
+	uint32_t m_full_grid_size{};
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_epsilon_r;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_mu_r;
 	Eigen::Array<floating_point_t, 1, Eigen::Dynamic> m_index_of_refraction;
