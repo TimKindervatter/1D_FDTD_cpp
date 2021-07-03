@@ -1,0 +1,3 @@
+Exception thrown when calling matplotlib::plot, fixed by using WXPython backend. See here:
+
+https://github.com/lava/matplotlib-cpp/issues/95
